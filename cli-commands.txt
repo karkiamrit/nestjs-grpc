@@ -9,3 +9,77 @@ protoc --plugin=protoc-gen-ts_proto=.\\node_modules\\.bin\\protoc-gen-ts_proto.c
 nest g lib common
 put the recently generate auth.ts using proto from proto to auth folder src/types
 
+****************************************
+change nest.cli to adjust to our protofil change entryFile,srcRoot and compilerOptions for each as 
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "./",
+  "entryFile": "src/main",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/apigateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/apigateway",
+  "projects": {
+    "apigateway": {
+      "type": "application",
+      "root": "apps/apigateway",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/apigateway/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
+      }
+    },
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "src/main",
+      "sourceRoot": "./",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth/tsconfig.app.json",
+        "assets": ["proto/*.proto"],
+        "watchAssets": true
+      }
+    },
+    "common": {
+      "type": "library",
+      "root": "libs/common",
+      "entryFile": "index",
+      "sourceRoot": "libs/common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    }
+  }
+}
+**************************************
+in common/src create new folder called constants with packages.ts as
+export const AUTH = 'auth';
+
+update main.ts of auth microservice as 
+
+import { NestFactory } from '@nestjs/core';
+import { AuthModule } from './auth.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { join } from 'path';
+import { AUTH } from '@app/common';
+
+async function bootstrap() {
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AuthModule,
+    {
+      transport: Transport.GRPC,
+      options: {
+        protoPath: join(__dirname,'../auth.proto'),
+        package: AUTH
+      },
+    },
+  );
+  await app.listen();
+}
+bootstrap();

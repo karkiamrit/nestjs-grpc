@@ -58,7 +58,7 @@ export interface UserServiceClient {
 
   removeUser(request: FindOneUserDto): Observable<User>;
 
-  queryUsers(request: Observable<PaginationDto>): Observable<User>;
+  queryUsers(request: Observable<PaginationDto>): Observable<Users>;
 }
 
 export interface UserServiceController {
@@ -72,7 +72,7 @@ export interface UserServiceController {
 
   removeUser(request: FindOneUserDto): Promise<User> | Observable<User> | User;
 
-  queryUsers(request: Observable<PaginationDto>): Observable<User>;
+  queryUsers(request: Observable<PaginationDto>): Observable<Users>;
 }
 
 export function UserServiceControllerMethods() {

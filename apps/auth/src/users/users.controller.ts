@@ -1,35 +1,35 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserServiceController, CreateUserDto, UpdateUserDto, UserServiceControllerMethods } from '@app/common';
+import { FindOneUserDto, PaginationDto, User } from '../../../../libs/common/src/types/auth';
+import { Observable } from 'rxjs';
 
 @Controller()
-export class UsersController {
+@UserServiceControllerMethods() //yo garesi @MessagePattern remove gareni proto ma defined type snga match xa ki nai auto verify garxa
+export class UsersController implements UserServiceController{
   constructor(private readonly usersService: UsersService) {}
 
-  @MessagePattern('createUser')
-  create(@Payload() createUserDto: CreateUserDto) {
+  createUser(createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  @MessagePattern('findAllUsers')
-  findAll() {
+  findAllUsers() {
     return this.usersService.findAll();
   }
 
-  @MessagePattern('findOneUser')
-  findOne(@Payload() id: number) {
-    return this.usersService.findOne(id);
+  findOneUser(findOneUserDto: FindOneUserDto) {
+    return this.usersService.findOne(findOneUserDto.id);
   }
 
-  @MessagePattern('updateUser')
-  update(@Payload() updateUserDto: UpdateUserDto) {
+  updateUser(updateUserDto: UpdateUserDto) {
     return this.usersService.update(updateUserDto.id, updateUserDto);
   }
 
-  @MessagePattern('removeUser')
-  remove(@Payload() id: number) {
-    return this.usersService.remove(id);
+  removeUser(findOneUserDto: FindOneUserDto) {
+    return this.usersService.remove(findOneUserDto.id);
+  }
+
+  queryUsers(paginationDtoStream: Observable<PaginationDto>){
+      return this.usersService.queryUsers(paginationDtoStream);
   }
 }
