@@ -2,4 +2,10 @@ nest new (project-name)
 nest generate app auth --> convert to monorepo
 change project-name to apigateway except in name of package json
 nest g resource users
-pnpmm - --save @nestjs/microservices @grpc/grpc-js @grpc/proto-loader ts-proto
+pnpm - --save @nestjs/microservices @grpc/grpc-js @grpc/proto-loader ts-proto
+**After writing proto file**
+protoc --plugin=protoc-gen-ts_proto=.\\node_modules\\.bin\\protoc-gen-ts_proto.cmd --ts_proto_out=./ --ts_proto_opt=nestJs=true ./proto/auth.proto
+
+nest g lib common
+put the recently generate auth.ts using proto from proto to auth folder src/types
+
